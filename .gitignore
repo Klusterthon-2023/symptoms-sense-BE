@@ -1,0 +1,16 @@
+__pycache__/
+.idea/
+*__pycache__/
+/symptoms_env/
+*.sqlite3
+.vscode/
+dump.rdb
+.env
+*.pyc
+*.bak
+*.dir
+*.dat
+*.vs/
+migrations/
+*.log
+__pycache__/*.pyc

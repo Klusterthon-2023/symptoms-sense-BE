@@ -1,0 +1,13 @@
+Dear {{name}},
+
+Thank you for joining Tuboh!At Tuboh, we are dedicated to making your health journey seamless, personalized, and convenient.
+
+Here's what you can do on Tuboh:
+1. Find and book appointments with top doctors easily.
+2. Schedule lab tests and receive results digitally.
+3. Order prescription drugs with a few taps.
+
+You're now one step closer to a healthier, happier you!
+Best Regards, The Tuboh Team
+
+© 2023 Tuboh.
