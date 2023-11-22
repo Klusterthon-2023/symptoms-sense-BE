@@ -291,7 +291,6 @@ CORS_ALLOWED_ORIGINS = [
 ]
 CSRF_TRUSTED_ORIGINS = ["http://localhost:3000"]
 
-
 if os.getcwd().startswith('/home/adewole'):
     DEBUG = False
     ALLOWED_HOSTS = ['adewole.pythonanywhere.com']
