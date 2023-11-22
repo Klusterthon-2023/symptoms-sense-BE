@@ -18,19 +18,22 @@ class GPTQuery:
         completion = self.client.chat.completions.create(
                         model="gpt-3.5-turbo",
                         messages=[
-                            {"role": "user", "content": "Does this message contain medical, sickness and illness information? If it doesn't, just return 'No':"},
+                            {"role": "assistant", "content": "If the following question does contain any medical, symptoms or general wellbeing/wellness related word, respond with a 'No'. If it does, then respond normally with my possible diagnosis and possible medication. And whether I need to visit a doctor:"},
                             {"role": "user", "content": f"{request}"},
                         ]
                     )
         
-        res = completion.choices[0].message.content
-        if res[:2] == 'No' and len(res)<=3:
-            return res
+        print(completion)
         
-        completion = self.client.chat.completions.create(
-                        model="gpt-3.5-turbo",
-                        messages=[
-                            {"role": "user", "content": f"{request}"},
-                        ]
-                    )
+        # res = completion.choices[0].message.content
+        # print(res)
+        # if res[:2] == 'No' and len(res)<=3:
+        #     return res
+        
+        # completion = self.client.chat.completions.create(
+        #                 model="gpt-3.5-turbo",
+        #                 messages=[
+        #                     {"role": "user", "content": f"{request}. What are my possible diagnosis and medications? Do I need to visit a doctor?"},
+        #                 ]
+        #             )
         return completion.choices[0].message.content

@@ -14,7 +14,7 @@ class ChatHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ChatHistory
         fields = "__all__"
-        read_only_fields = ('id', 'date_time_created', 'date_time_updated')
+        read_only_fields = ('id', 'date_time_created', 'date_time_updated', 'helpful')
 
 
 class ChatRequestSerializer(serializers.ModelSerializer):
@@ -29,4 +29,19 @@ class ChatRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChatHistory
         fields = "__all__"
-        read_only_fields = ('id', 'user', 'response', 'helpful' 'date_time_created', 'date_time_updated',)
+        read_only_fields = ('id', 'user', 'response', 'helpful', 'date_time_created', 'date_time_updated',)
+
+
+class ChatResponseHelpfulSerializer(serializers.ModelSerializer):
+    
+    helpful = serializers.BooleanField(allow_null=True) 
+    user = serializers.StringRelatedField()    
+    
+    parent_lookup_kwargs = {
+        'user_pk': 'user_pk',
+    }
+    
+    class Meta:
+        model = ChatHistory
+        fields = "__all__"
+        read_only_fields = ('id', 'user', 'response', 'request', 'date_time_created', 'date_time_updated',)
