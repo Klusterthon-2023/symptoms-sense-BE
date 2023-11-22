@@ -32,7 +32,7 @@ CHAT_GPT_KEY = os.environ.get("CHAT_GPT_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', '.vercel.app']
+ALLOWED_HOSTS = ['127.0.0.1']
 
 
 # Application definition
@@ -283,3 +283,19 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
 }
+
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000"
+]
+CSRF_TRUSTED_ORIGINS = ["http://localhost:3000"]
+
+
+if os.getcwd().startswith('/home/adewole'):
+    DEBUG = False
+    ALLOWED_HOSTS = ['adewole.pythonanywhere.com']
+    CORS_ALLOWED_ORIGINS = [
+        "https://symptoms-sense-fe.vercel.app"
+    ]
+    CSRF_TRUSTED_ORIGINS = ["https://symptoms-sense-fe.vercel.app"]
