@@ -4,7 +4,8 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
-import json
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 
 from .models import ChatHistory
 from .serializers import ChatHistorySerializer, ChatRequestSerializer, ChatResponseHelpfulSerializer
@@ -37,29 +38,39 @@ class ChatRequestViewset(viewsets.GenericViewSet):
         
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        if "request_audio" in serializer.validated_data:
-            req = serializer.validated_data['request_audio']
-        else:            
-            req = serializer.validated_data['request']
-        
-        if not req:
-            return Response({'detail': "Request is invalid"}, status=status.HTTP_400_BAD_REQUEST)
-    
         query = GPTQuery()
-        response = query.get_response(req)
-        print(response)
-        
-        if not response:
-            return Response({'detail': "Couldn't send request. Try again later"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-        if response.lower()=='no' or response.lower()=='no.':
-            return Response({'detail': "This AI-bot only respond to medical related symptoms"}, status=status.HTTP_400_BAD_REQUEST)
 
-        history = ChatHistory.objects.create(
-            user = get_object_or_404(UsersAuth, id=self.kwargs['user_pk']),
-            request = serializer.validated_data['request'],
-            response = response,
-        )
+        if 'request' not in serializer.validated_data and 'request_audio' not in serializer.validated_data:
+            return Response({'detail': "Request is invalid. You need to make a request"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if 'request' in serializer.validated_data and 'request_audio' in serializer.validated_data:
+            return Response({'detail': "Request is invalid. You need to send either text or audio data"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if "request_audio" in serializer.validated_data:
+            req = (serializer.validated_data['request_audio']).file
+
+            temp_req = default_storage.save('tmp/request.mp3', ContentFile(req.read()))
+            response = query.transcribe(temp_req)
+            default_storage.delete('tmp/request.mp3')
+        else:
+            req = serializer.validated_data['request']
+            response = query.get_response(req)
+
+        if not response:
+            return Response({'detail': "Couldn't process request. Try again later"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        if "request_audio" in serializer.validated_data:
+            history = ChatHistory.objects.create(
+                user = get_object_or_404(UsersAuth, id=self.kwargs['user_pk']),
+                request = req,
+                response = response,
+            )
+        else:
+            history = ChatHistory.objects.create(
+                user = get_object_or_404(UsersAuth, id=self.kwargs['user_pk']),
+                request_audio = req,
+                response = response,
+            )
         serializer = self.get_serializer(history, data=request.data)
 
         return Response({'detail': response}, status=status.HTTP_200_OK)

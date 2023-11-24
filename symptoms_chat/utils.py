@@ -1,7 +1,9 @@
 # guidance_app.utils
 
+import os
 from django.conf import settings
 from openai import OpenAI
+from django.conf import settings
 
 class GPTQuery:
     
@@ -14,30 +16,29 @@ class GPTQuery:
         
         if not self.client:
             return
-        
-        if isinstance(request, str):        
-            completion = self.client.chat.completions.create(
+               
+        return self.completion(request)
+            
+    def completion(self, request):
+        completion = self.client.chat.completions.create(
                             model="ft:gpt-3.5-turbo-0613:personal::8OFaUXrw",
                             messages=[
-                                {"role": "system", "content": "If the following question does contain any medical, symptoms or general wellbeing/wellness related word, respond with a typical response for a question you can't answer such as \"I'm sorry, but I don't have enough information on that topic.\" or \"I'm sorry, but I can't assist with that.\". If it does, then respond normally with fully-detailed explanation under the following but not limited to headings, as applicable: 'causes', 'diagnosis', 'medication', 'preventive measures', 'If/when to visit a doctor' "},
+                                {"role": "system", "content": "If the following question does contain any medical, symptoms or general wellbeing/wellness related word, respond with a typical response for a question you can't answer such as \"I'm sorry, but I can't assist with that.\" or \"I'm sorry, but I don't have enough information on that topic.\", unless it's based on a previous medical request or medical response. If it does, then respond normally with fully-detailed explanation under the following but not limited to headings, as applicable: 'causes', 'diagnosis', 'medication', 'preventive measures', 'If/when to visit a doctor'. Also, don't forget that all requests will be in English. You might need to detect the language first."},
                                 {"role": "user", "content": f"{request}"},
                             ]
                         )
-
-        else:
-            pass
         
-        print(completion)
-        
-        # res = completion.choices[0].message.content
-        # print(res)
-        # if res[:2] == 'No' and len(res)<=3:
-        #     return res
-        
-        # completion = self.client.chat.completions.create(
-        #                 model="gpt-3.5-turbo",
-        #                 messages=[
-        #                     {"role": "user", "content": f"{request}. What are my possible diagnosis and medications? Do I need to visit a doctor?"},
-        #                 ]
-        #             )
         return completion.choices[0].message.content
+            
+    def transcribe(self, audio) -> str|None:
+        if not self.client:
+            return
+        
+        audio_file= open(os.path.join(settings.MEDIA_ROOT, audio), "rb")
+        transcript = self.client.audio.transcriptions.create(
+            model="whisper-1", 
+            file=audio_file
+            )
+
+        return self.completion(transcript.text)
+        

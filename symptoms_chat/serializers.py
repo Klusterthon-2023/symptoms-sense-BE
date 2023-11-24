@@ -19,8 +19,8 @@ class ChatHistorySerializer(serializers.ModelSerializer):
 
 class ChatRequestSerializer(serializers.ModelSerializer):
     
-    request = serializers.CharField(write_only=True, allow_null=True)
-    # request_audio = serializers.FileField(write_only=True, allow_null=True)
+    request = serializers.CharField(write_only=True, required=False)
+    request_audio = serializers.FileField(write_only=True, required=False)
     user = serializers.StringRelatedField()
     
     parent_lookup_kwargs = {
@@ -45,4 +45,4 @@ class ChatResponseHelpfulSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChatHistory
         fields = "__all__"
-        read_only_fields = ('id', 'user', 'response', 'request', 'date_time_created', 'date_time_updated',)
+        read_only_fields = ('id', 'user', 'response', 'request', 'date_time_created', 'date_time_updated', 'request_audio')
