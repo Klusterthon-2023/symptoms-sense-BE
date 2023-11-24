@@ -19,13 +19,14 @@ class ChatHistorySerializer(serializers.ModelSerializer):
 
 class ChatRequestSerializer(serializers.ModelSerializer):
     
-    request = serializers.CharField(write_only=True) 
-    user = serializers.StringRelatedField()    
+    request = serializers.CharField(write_only=True, allow_null=True)
+    # request_audio = serializers.FileField(write_only=True, allow_null=True)
+    user = serializers.StringRelatedField()
     
     parent_lookup_kwargs = {
         'user_pk': 'user_pk',
     }
-    
+
     class Meta:
         model = ChatHistory
         fields = "__all__"

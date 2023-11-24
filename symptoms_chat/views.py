@@ -37,7 +37,10 @@ class ChatRequestViewset(viewsets.GenericViewSet):
         
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        req = serializer.validated_data['request']
+        if "request_audio" in serializer.validated_data:
+            req = serializer.validated_data['request_audio']
+        else:            
+            req = serializer.validated_data['request']
         
         if not req:
             return Response({'detail': "Request is invalid"}, status=status.HTTP_400_BAD_REQUEST)

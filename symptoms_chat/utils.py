@@ -15,13 +15,17 @@ class GPTQuery:
         if not self.client:
             return
         
-        completion = self.client.chat.completions.create(
-                        model="gpt-3.5-turbo",
-                        messages=[
-                            {"role": "assistant", "content": "If the following question does contain any medical, symptoms or general wellbeing/wellness related word, respond with a 'No'. If it does, then respond normally with my possible diagnosis and possible medication. And whether I need to visit a doctor:"},
-                            {"role": "user", "content": f"{request}"},
-                        ]
-                    )
+        if isinstance(request, str):        
+            completion = self.client.chat.completions.create(
+                            model="ft:gpt-3.5-turbo-0613:personal::8OFaUXrw",
+                            messages=[
+                                {"role": "system", "content": "If the following question does contain any medical, symptoms or general wellbeing/wellness related word, respond with a typical response for a question you can't answer such as \"I'm sorry, but I don't have enough information on that topic.\" or \"I'm sorry, but I can't assist with that.\". If it does, then respond normally with fully-detailed explanation under the following but not limited to headings, as applicable: 'causes', 'diagnosis', 'medication', 'preventive measures', 'If/when to visit a doctor' "},
+                                {"role": "user", "content": f"{request}"},
+                            ]
+                        )
+
+        else:
+            pass
         
         print(completion)
         
