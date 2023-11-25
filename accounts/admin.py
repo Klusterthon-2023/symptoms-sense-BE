@@ -21,6 +21,49 @@ class UsersAuthAdmin(UserAdmin):
     list_select_related = True
     save_on_top = True
     # inlines = [UserPasswordChangeInline]
+    fieldsets = [
+        (
+            'Personal',
+            {
+                "fields": ['id', 'first_name', 'last_name', 'email',],
+                "classes": ['extrapretty']
+            },
+        ),
+        (
+            'Authentication',
+            {
+                "fields": ['password'],
+            }
+        ),
+        (
+            "Password reset token",
+            {
+                "fields": ["pass_reset_token", 'reset_token_creation_time'],
+                "classes": ['extrapretty']
+            },
+        ),
+        (
+            "Important dates",
+            {
+                "fields": ['date_time_created', 'date_time_modified', 'last_login'],
+                "classes": ['extrapretty']
+            },
+        ),
+        (
+            "Designation",
+            {
+                "fields": ['is_deleted', 'is_active', 'is_staff'],
+                "classes": ['extrapretty']
+            }
+        ),
+        (
+            "Permissions",
+            {
+                "fields": ['groups', 'user_permissions'],
+                "classes": ['extrapretty']
+            }
+        )
+    ]
 
 
 
