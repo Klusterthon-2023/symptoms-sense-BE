@@ -306,10 +306,14 @@ if os.getcwd().startswith('/home/adewole'):
     CORS_ALLOWED_ORIGINS = [
         "https://symptoms-sense-fe.vercel.app",
         "http://localhost:3000",
-        "http://127.0.0.1:3000"
+        "http://127.0.0.1:3000",
+        "localhost:3000",
+        "127.0.0.1:3000",
     ]
     CSRF_TRUSTED_ORIGINS = [
         "https://symptoms-sense-fe.vercel.app",
         "http://localhost:3000",
-        "http://127.0.0.1:3000"
+        "http://127.0.0.1:3000",
+        "localhost:3000",
+        "127.0.0.1:3000",
     ]
