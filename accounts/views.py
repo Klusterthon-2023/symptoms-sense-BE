@@ -74,9 +74,13 @@ class UserViewset(viewsets.ModelViewSet):
         user.set_password(password)
         user.save()
         user.send_welcome_email()
-                    
+        data = serializer.data
+        refresh = RefreshToken.for_user(user)
+        data['access_token'] = str(refresh.access_token)
+        data['refresh_token'] = str(refresh)
+
         headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(data, status=status.HTTP_201_CREATED, headers=headers)
     
     @action(methods=['POST'], detail=False)
     def Login(self, request, format=None):

@@ -27,10 +27,13 @@ class NewUserSerializer(serializers.ModelSerializer):
         label = 'Password again',
         style={'input_type': 'password', 'placeholder': 'Password'})
     
+    access_token = serializers.CharField(read_only=True)
+    refresh_token = serializers.CharField(read_only=True)
+    
     class Meta:
         model = UsersAuth
-        fields = ('id', 'first_name', 'last_name', 'email', 'password', 're_password', 'date_time_created', 'date_time_modified')
-        read_only_fields = ('id', 'date_time_created', 'date_time_modified')
+        fields = ('id', 'first_name', 'last_name', 'email', 'password', 're_password', 'access_token', 'refresh_token', 'date_time_created', 'date_time_modified')
+        read_only_fields = ('id', 'date_time_created', 'date_time_modified',  'access_token', 'refresh_token',)
 
     def validate(self, attrs):
          
