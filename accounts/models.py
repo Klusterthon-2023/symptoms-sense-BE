@@ -15,6 +15,8 @@ from .utils import send_multi_format_email
 class UsersAuth(AbstractBaseUser, PermissionsMixin):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
     email = models.EmailField(max_length=200, unique=True)
     pass_reset_token = models.CharField(
         max_length=256, default=None, null=True, blank=True)
@@ -77,7 +79,7 @@ class UsersAuth(AbstractBaseUser, PermissionsMixin):
     def send_email(self, prefix, code=None):
         ctxt = {
             'email': self.email,
-            # 'name': f'{self.first_name}',
+            'name': f'{self.first_name}',
             'code': str(code)
         }
         send_multi_format_email(prefix, ctxt, target_email=self.email)

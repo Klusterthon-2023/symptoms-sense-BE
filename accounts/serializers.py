@@ -14,7 +14,7 @@ class UserSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = UsersAuth
-        fields = ('id', 'email', 'date_time_created', 'date_time_modified', 'is_deleted')
+        fields = ('id', 'first_name', 'last_name', 'email', 'date_time_created', 'date_time_modified', 'is_deleted')
         read_only_fields = ('id', 'date_time_created', 'date_time_modified', 'is_deleted', 'email')
 
 class NewUserSerializer(serializers.ModelSerializer):
@@ -29,18 +29,22 @@ class NewUserSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = UsersAuth
-        fields = ('id', 'email', 'password', 're_password', 'date_time_created', 'date_time_modified')
+        fields = ('id', 'first_name', 'last_name', 'email', 'password', 're_password', 'date_time_created', 'date_time_modified')
         read_only_fields = ('id', 'date_time_created', 'date_time_modified')
 
-    def validate(self, attrs):        
-        
-        user = UsersAuth(**attrs)
+    def validate(self, attrs):
          
         # get the password from the data
         password = attrs.get('password')
         password2 = attrs.pop('re_password')
+        
+        user = UsersAuth(**attrs)
 
-        errors = dict() 
+        errors = dict()
+        
+        if str(attrs.get('first_name')).isnumeric(): errors['first_name']="All characters cannot be numeric"
+        if str(attrs.get('last_name')).isnumeric(): errors['last_name']="All characters cannot be numeric"
+        
         
         if password != password2:
             errors['password']='Passwords do not match'
@@ -74,6 +78,8 @@ class LoginSerializer(serializers.Serializer):
     
     access_token = serializers.CharField(read_only=True)
     refresh_token = serializers.CharField(read_only=True)
+    first_name = serializers.CharField(read_only=True)
+    last_name = serializers.CharField(read_only=True)
     user_id = serializers.CharField(read_only=True)
     
     def validate(self, attrs):

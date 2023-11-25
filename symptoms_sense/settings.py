@@ -166,7 +166,13 @@ REST_FRAMEWORK = {
         'rest_framework.filters.OrderingFilter',
     ),
 }
-
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'madedayo@gmail.com'
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASS')
+EMAIL_FROM = 'Symptom sense'
 
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
@@ -295,6 +301,12 @@ if os.getcwd().startswith('/home/adewole'):
     DEBUG = False
     ALLOWED_HOSTS = ['adewole.pythonanywhere.com']
     CORS_ALLOWED_ORIGINS = [
-        "https://symptoms-sense-fe.vercel.app"
+        "https://symptoms-sense-fe.vercel.app",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000"
     ]
-    CSRF_TRUSTED_ORIGINS = ["https://symptoms-sense-fe.vercel.app"]
+    CSRF_TRUSTED_ORIGINS = [
+        "https://symptoms-sense-fe.vercel.app",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000"
+    ]

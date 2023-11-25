@@ -95,6 +95,9 @@ class UserViewset(viewsets.ModelViewSet):
                         data = {
                             'access': str(refresh.access_token),
                             'refresh': str(refresh),
+                            'first_name': user.first_name,
+                            'last_name': user.last_name,
+                            'email': user.email,                            
                             'user_id': user.id
                         }
                         return Response(data, status=status.HTTP_200_OK)
@@ -194,39 +197,6 @@ class UserViewset(viewsets.ModelViewSet):
                     user.save()
 
                     return Response({'detail': _('Password changed.')}, status=status.HTTP_200_OK)
-
-                return Response({'detail': 'Token not valid'}, status=status.HTTP_400_BAD_REQUEST)
-
-            except UsersAuth.DoesNotExist:
-                return Response({'detail': 'Email not valid'}, status=status.HTTP_404_NOT_FOUND)
-
-        return Response(serializer.errors,
-                        status=status.HTTP_400_BAD_REQUEST)
-
-    # Function to verify reset password token
-    @action(methods=['POST'], detail=False)
-    def ResetPasswordTokenVerify(self, request, format=None):
-        serializer = self.get_serializer_class()(data=request.data)
-
-        if serializer.is_valid():
-            email = serializer.validated_data['email']
-            token = serializer.validated_data['token']
-
-            try:
-                user = UsersAuth.objects.get(email=email)
-                if not user.pass_reset_token:
-                    return Response({'detail': "User does not have password reset request"}, status=status.HTTP_400_BAD_REQUEST)
-                check = check_password(token, user.pass_reset_token)
-                
-
-                if check:
-                    now = timezone.now()
-                    token_time = user.reset_token_creation_time
-                    expiry_time = ((now - token_time).seconds)/60
-                    if expiry_time > 15:
-                        return Response({'detail': 'Token expired'}, status=status.HTTP_403_FORBIDDEN)
-
-                    return Response({'detail': _('Token confirmed.')}, status=status.HTTP_200_OK)
 
                 return Response({'detail': 'Token not valid'}, status=status.HTTP_400_BAD_REQUEST)
 
