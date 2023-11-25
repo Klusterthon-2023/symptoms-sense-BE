@@ -19,8 +19,8 @@ class ChatHistorySerializer(serializers.ModelSerializer):
 
 class ChatRequestSerializer(serializers.ModelSerializer):
     
-    request = serializers.CharField(write_only=True, required=False)
-    request_audio = serializers.FileField(write_only=True, required=False)
+    request = serializers.CharField(write_only=True)
+    # request_audio = serializers.FileField(write_only=True, required=False)
     user = serializers.StringRelatedField()
     
     parent_lookup_kwargs = {
