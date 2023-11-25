@@ -56,7 +56,7 @@ class UserViewset(viewsets.ModelViewSet):
         """
         if self.action in ('update', 'partial_update', 'retrieve', 'ChangePassword'):
             permission_classes = [IsOwnerSuperuser]
-        elif self.action == ('destroy', 'list'):
+        elif self.action in ('destroy', 'list'):
             permission_classes = [permissions.IsAdminUser]
         else:
             permission_classes = [permissions.AllowAny]
