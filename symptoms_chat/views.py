@@ -54,13 +54,9 @@ class ChatHistoryIdentifierViewset(viewsets.GenericViewSet):
     @action(methods=['GET'], detail=True, serializer_class=ChatIdentifierHistorySerializer)
     def ListChatIdentifierHistory(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
+        obj = get_object_or_404(queryset, pk=self.kwargs['pk'])
 
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
+        serializer = self.get_serializer(obj)
         return Response(serializer.data)
 
 
