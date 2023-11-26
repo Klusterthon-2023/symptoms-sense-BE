@@ -21,9 +21,9 @@ class GPTQuery:
             
     def completion(self, request):
         completion = self.client.chat.completions.create(
-                            model="ft:gpt-3.5-turbo-0613:personal::8OFaUXrw",
+                            model="ft:gpt-3.5-turbo-0613:personal::8PBGhaOu",
                             messages=[
-                                {"role": "system", "content": "If the following question does contain any medical, symptoms or general wellbeing/wellness related word, respond with a typical response for a question you can't answer such as \"I'm sorry, but I can't assist with that.\", unless it's based on a previous medical request or medical response. If it does, then respond normally with fully-detailed explanation under the following but not limited to headings, as applicable: 'causes', 'diagnosis', 'medication', 'preventive measures', 'If/when to visit a doctor'. Also, don't forget that all requests will be in English. You might need to detect the language first."},
+                                {"role": "system", "content": "If the following question does contain any medical, symptoms or general wellbeing/wellness related word, respond with a typical response for a question you can't answer such as \"I'm sorry, but I can't assist with that.\", unless it's based on a previous medical request or medical response. If it does, then respond normally with fully-detailed explanation under the following but not limited to headings, as applicable: 'causes', 'diagnosis', 'medication', 'preventive measures', 'If/when to visit a doctor'. Also, don't forget that all requests may not be be in English. You might need to detect the language first."},
                                 {"role": "user", "content": f"{request}"},
                             ]
                         )
