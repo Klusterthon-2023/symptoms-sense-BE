@@ -11,9 +11,9 @@ class ChatAdmin(admin.ModelAdmin):
     date_hierarchy = "date_time_created"
     empty_value_display = "-empty-"
     readonly_fields = ('id', 'date_time_created', 'date_time_modified')
-    list_display = ['user', 'request', 'response']
-    ordering = ['-date_time_created', 'user', 'helpful']
-    list_filter = ['helpful', 'user', 'date_time_created']
+    list_display = ['chat_identifier', 'request', 'response']
+    ordering = ['-date_time_created', 'helpful']
+    list_filter = ['helpful', 'date_time_created', 'chat_identifier']
     search_fields = ['request', 'response']
     list_per_page = 50
     list_max_show_all = 200

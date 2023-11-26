@@ -7,8 +7,10 @@ from django.views.static import serve
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from rest_framework.documentation import include_docs_urls
 from django.conf import settings
+from rest_framework.routers import DefaultRouter
 
 from . import views
+from symptoms_chat.views import FeedbacksViewset
 
 
 urlpatterns = [
@@ -17,6 +19,7 @@ urlpatterns = [
     path("", views.index_view, name="index"),
     path("api/UsersAuths/", include("accounts.urls")),
     path("api/", include("symptoms_chat.urls")),
+    path('api/feedbacks/', FeedbacksViewset.as_view({'post': "Create"})),
     
     path('api/schema/', SpectacularAPIView.as_view(), name='Health schema'),
     path('api/docs/', include_docs_urls(title='Health API')),

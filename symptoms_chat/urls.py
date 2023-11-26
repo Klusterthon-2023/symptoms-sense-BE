@@ -11,14 +11,13 @@ router = DefaultRouter()
 router.register('', UserViewset, basename='auth')
 
 history_routers = NestedDefaultRouter(router, '', lookup='user')
-history_routers.register('guidance-bot/history', views.ChatHistoryViewset, basename='user-chat-history')
+history_routers.register('History', views.ChatHistoryIdentifierViewset, basename='user-chat-history')
 
 request_routers = NestedDefaultRouter(router, '', lookup='user')
-request_routers.register('send-request', views.ChatRequestViewset, basename='user-chat-request')
+request_routers.register('PostRequest', views.ChatRequestViewset, basename='user-chat-request')
 
 
 urlpatterns = [
     path('', include(history_routers.urls)),
     path('', include(request_routers.urls)),
 ]
-

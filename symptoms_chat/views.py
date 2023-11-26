@@ -4,24 +4,64 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
-from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
 
-from .models import ChatHistory
-from .serializers import ChatHistorySerializer, ChatRequestSerializer, ChatResponseHelpfulSerializer
+from .models import ChatHistory, ChatIdentifier, Feedbacks
+from .serializers import (ChatIdentifierSerializer,
+                          FeedbackSerializer,
+                          ChatIdentifierHistorySerializer,
+                          ChatRequestSerializer, 
+                          ChatResponseHelpfulSerializer)
 from .utils import GPTQuery
 from accounts.models import UsersAuth
 from accounts.permissions import IsOwnerUserOrSuperuser
 
 
-class ChatHistoryViewset(viewsets.ReadOnlyModelViewSet):
+class FeedbacksViewset(viewsets.GenericViewSet):
     
-    queryset = ChatHistory.objects.all()
-    serializer_class = ChatHistorySerializer
+    queryset = Feedbacks.objects.all()
+    serializer_class = FeedbackSerializer
+    permission_classes = [permissions.AllowAny]
+    
+    @action(methods=['POST'], detail=False)
+    def Create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class ChatHistoryIdentifierViewset(viewsets.GenericViewSet):
+    
+    queryset = ChatIdentifier.objects.all()
+    serializer_class = ChatIdentifierSerializer
     permission_classes = [IsOwnerUserOrSuperuser]
     
     def get_queryset(self):
         return self.queryset.filter(user=get_object_or_404(UsersAuth, id=self.kwargs['user_pk']))
+    
+    @action(methods=['GET'], detail=False, serializer_class=ChatIdentifierSerializer)
+    def ListChatIdentifiers(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @action(methods=['GET'], detail=True, serializer_class=ChatIdentifierHistorySerializer)
+    def ListChatIdentifierHistory(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class ChatRequestViewset(viewsets.GenericViewSet):
@@ -29,15 +69,13 @@ class ChatRequestViewset(viewsets.GenericViewSet):
     queryset = ChatHistory.objects.all()
     serializer_class = ChatRequestSerializer
     permission_classes = [permissions.IsAuthenticated]
-    
-    def get_queryset(self):
-        return self.queryset.filter(user=get_object_or_404(UsersAuth, id=self.kwargs['user_pk']))
-    
-    @action(methods=['POST'], detail=False)
-    def PostRequest(self, request, *args, **kwargs):
+
+    @action(methods=['POST'], detail=False, serializer_class=ChatRequestSerializer)
+    def Create(self, request, *args, **kwargs):
         
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
         query = GPTQuery()
         
         req = serializer.validated_data['request']
@@ -45,54 +83,25 @@ class ChatRequestViewset(viewsets.GenericViewSet):
         
         if not response:
             return Response({'detail': "Couldn't process request. Try again later"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-        history = ChatHistory.objects.create(
+
+        try:
+            chat_identifier = ChatIdentifier.objects.get(identifier=serializer.validated_data['identifier'])
+        except ChatIdentifier.DoesNotExist:
+            chat_identifier = ChatIdentifier.objects.create(
                 user = get_object_or_404(UsersAuth, id=self.kwargs['user_pk']),
+                identifier=serializer.validated_data['identifier'], title=req[:50])
+        history = ChatHistory.objects.create(
+                chat_identifier = chat_identifier,
                 request = req,
                 response = response,
             )
         serializer = self.get_serializer(history, data=request.data)
 
         return Response({'detail': response}, status=status.HTTP_200_OK)
-
-        # if 'request' not in serializer.validated_data and 'request_audio' not in serializer.validated_data:
-        #     return Response({'detail': "Request is invalid. You need to make a request"}, status=status.HTTP_400_BAD_REQUEST)
-
-        # if 'request' in serializer.validated_data and 'request_audio' in serializer.validated_data:
-        #     return Response({'detail': "Request is invalid. You need to send either text or audio data"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # if "request_audio" in serializer.validated_data:
-        #     req = (serializer.validated_data['request_audio']).file
-
-        #     temp_req = default_storage.save('tmp/request.mp3', ContentFile(req.read()))
-        #     response = query.transcribe(temp_req)
-        #     default_storage.delete('tmp/request.mp3')
-        # else:
-        #     req = serializer.validated_data['request']
-        #     response = query.get_response(req)
-
-        # if not response:
-        #     return Response({'detail': "Couldn't process request. Try again later"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        # if "request_audio" in serializer.validated_data:
-        #     history = ChatHistory.objects.create(
-        #         user = get_object_or_404(UsersAuth, id=self.kwargs['user_pk']),
-        #         request = req,
-        #         response = response,
-        #     )
-        # else:
-        #     history = ChatHistory.objects.create(
-        #         user = get_object_or_404(UsersAuth, id=self.kwargs['user_pk']),
-        #         request_audio = req,
-        #         response = response,
-        #     )
-        # serializer = self.get_serializer(history, data=request.data)
-
-        # return Response({'detail': response}, status=status.HTTP_200_OK)
     
     @action(methods=['PUT'], detail=True, serializer_class=ChatResponseHelpfulSerializer)
     def SetHelpful(self, request, *args, **kwargs):
-        instance = get_object_or_404(self.get_queryset(), pk=self.kwargs['pk'])
+        instance = get_object_or_404(ChatHistory.objects.all(), pk=self.kwargs['pk'])
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
