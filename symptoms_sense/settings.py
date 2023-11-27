@@ -305,12 +305,15 @@ if os.getcwd().startswith('/home/adewole'):
     ALLOWED_HOSTS = ['adewole.pythonanywhere.com', 'localhost', '127.0.0.1']
     CORS_ALLOW_ALL_ORIGINS = False
     CORS_ALLOWED_ORIGINS = [
-        "https://symptoms-sense-fe.vercel.app",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
+        "https://symptoms-sense-fe-ts.vercel.app",
+        "https://symptoms-sense-fe-ts-git-main-klusterthon2023.vercel.app",
     ]
     CSRF_TRUSTED_ORIGINS = [
         "https://symptoms-sense-fe.vercel.app",
         "http://localhost:3000",
-        "http://127.0.0.1:3000"
+        "http://127.0.0.1:3000",
+        "https://symptoms-sense-fe-ts.vercel.app",
+        "https://symptoms-sense-fe-ts-git-main-klusterthon2023.vercel.app",
     ]
