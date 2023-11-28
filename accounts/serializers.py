@@ -16,6 +16,15 @@ class UserSerializer(serializers.ModelSerializer):
         model = UsersAuth
         fields = ('id', 'first_name', 'last_name', 'email', 'date_time_created', 'date_time_modified', 'is_deleted')
         read_only_fields = ('id', 'date_time_created', 'date_time_modified', 'is_deleted', 'email')
+        
+class GoogleAuthSerializer(serializers.Serializer):
+    email = serializers.EmailField(max_length=255)    
+    access_token = serializers.CharField(read_only=True)
+    refresh_token = serializers.CharField(read_only=True)
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    user_id = serializers.CharField(read_only=True)
+    
 
 class NewUserSerializer(serializers.ModelSerializer):
     

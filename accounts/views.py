@@ -121,7 +121,26 @@ class UserViewset(viewsets.ModelViewSet):
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
             
-    
+    @action(methods=['POST'], detail=False, serializer_class=serializers.GoogleAuthSerializer)
+    def GoogleAuth(self, request, format=None):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            user = UsersAuth.objects.get(email=serializer.validated_data['email'])
+        except UsersAuth.DoesNotExist:
+            user = UsersAuth.objects.create(
+                email=serializer.validated_data['email'],
+                first_name=serializer.validated_data['first_name'],
+                last_name=serializer.validated_data['last_name'],
+            )
+        data = serializer.data
+        refresh = RefreshToken.for_user(user)
+        print(refresh)
+        data['access_token'] = str(refresh.access_token)
+        data['refresh_token'] = str(refresh)
+        data['user_id'] = str(user.id)
+            
+        return Response(data, status=status.HTTP_200_OK)
 
     # Function to change password
     @action(methods=['POST'], detail=True)
