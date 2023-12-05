@@ -5,12 +5,22 @@ from django.db import models
 from django.utils.translation import gettext as _
 
 
+class ChatIdentifierDate(models.Model):
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    date = models.DateField(auto_now=False, auto_now_add=False)
+    
+    class Meta:
+        ordering = ('-date',)
+
+
 class ChatIdentifier(models.Model):
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey("accounts.UsersAuth", on_delete=models.CASCADE, related_name="chat_identifier")
     identifier = models.CharField(max_length=100, unique=True)
     title = models.CharField(max_length=50)
+    date = models.ForeignKey("symptoms_chat.ChatIdentifierDate", on_delete=models.CASCADE, related_name="chat_identifiers")
     date_time_created = models.DateTimeField(auto_now_add=True)
     date_time_modified = models.DateTimeField(auto_now=True)
     

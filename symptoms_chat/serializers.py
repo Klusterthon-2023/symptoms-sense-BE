@@ -2,7 +2,7 @@
 
 from rest_framework import serializers
 
-from .models import ChatHistory, ChatIdentifier, Feedbacks
+from .models import ChatHistory, ChatIdentifier, Feedbacks, ChatIdentifierDate
 
 
 class FeedbackSerializer(serializers.ModelSerializer):
@@ -34,6 +34,19 @@ class ChatIdentifierSerializer(serializers.ModelSerializer):
         model = ChatIdentifier
         # fields = "__all__"
         exclude = ("user",)
+        
+
+class ChatIdentifierDateSerializer(serializers.ModelSerializer):
+    
+    parent_lookup_kwargs = {
+        'user_pk': 'user_pk',
+    }
+    chat_identifiers = ChatIdentifierSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = ChatIdentifierDate
+        fields = ('date', 'chat_identifiers')
+    
 
 
 class ChatIdentifierHistorySerializer(serializers.ModelSerializer):

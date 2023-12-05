@@ -1,13 +1,14 @@
 # guidance_app.views
 
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, permissions, status, serializers
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
-from .models import ChatHistory, ChatIdentifier, Feedbacks
+from .models import ChatHistory, ChatIdentifier, Feedbacks, ChatIdentifierDate
 from .serializers import (ChatIdentifierSerializer,
-                          FeedbackSerializer,
+                          FeedbackSerializer, ChatIdentifierDateSerializer,
                           ChatIdentifierHistorySerializer,
                           ChatRequestSerializer, 
                           ChatResponseHelpfulSerializer)
@@ -39,9 +40,9 @@ class ChatHistoryIdentifierViewset(viewsets.GenericViewSet):
     def get_queryset(self):
         return self.queryset.filter(user=get_object_or_404(UsersAuth, id=self.kwargs['user_pk']))
     
-    @action(methods=['GET'], detail=False, serializer_class=ChatIdentifierSerializer)
+    @action(methods=['GET'], detail=False, serializer_class=ChatIdentifierDateSerializer)
     def ListChatIdentifiers(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+        queryset = self.filter_queryset(ChatIdentifierDate.objects.filter(chat_identifiers__user=get_object_or_404(UsersAuth, id=self.kwargs['user_pk'])))
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -79,12 +80,17 @@ class ChatRequestViewset(viewsets.GenericViewSet):
         
         if not response:
             return Response({'detail': "Couldn't process request. Try again later"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        try:
+            date = ChatIdentifierDate.objects.get(date=timezone.now().date())
+        except ChatIdentifierDate.DoesNotExist:
+            date = ChatIdentifierDate.objects.create(date=timezone.now().date())
 
         try:
             chat_identifier = ChatIdentifier.objects.get(identifier=serializer.validated_data['identifier'])
         except ChatIdentifier.DoesNotExist:
             chat_identifier = ChatIdentifier.objects.create(
-                user = get_object_or_404(UsersAuth, id=self.kwargs['user_pk']),
+                user = get_object_or_404(UsersAuth, id=self.kwargs['user_pk']), date=date,
                 identifier=serializer.validated_data['identifier'], title=req[:50])
         history = ChatHistory.objects.create(
                 chat_identifier = chat_identifier,
