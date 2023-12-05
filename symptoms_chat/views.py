@@ -98,8 +98,9 @@ class ChatRequestViewset(viewsets.GenericViewSet):
                 response = response,
             )
         serializer = self.get_serializer(history, data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        return Response({'detail': response}, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
     @action(methods=['PUT'], detail=True, serializer_class=ChatResponseHelpfulSerializer)
     def SetHelpful(self, request, *args, **kwargs):

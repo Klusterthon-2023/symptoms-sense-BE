@@ -8,7 +8,7 @@ from django.utils.translation import gettext as _
 class ChatIdentifierDate(models.Model):
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    date = models.DateField(auto_now=False, auto_now_add=False)
+    date = models.DateField(auto_now=False, auto_now_add=False, unique=True)
     
     class Meta:
         ordering = ('-date',)
