@@ -43,7 +43,7 @@ class ChatHistoryIdentifierViewset(viewsets.GenericViewSet):
     @action(methods=['GET'], detail=False, serializer_class=ChatIdentifierDateSerializer)
     def ListChatIdentifiers(self, request, *args, **kwargs):
         queryset = self.filter_queryset(ChatIdentifierDate.objects.filter(chat_identifiers__user=get_object_or_404(UsersAuth, id=self.kwargs['user_pk'])))
-
+        print(queryset)
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -79,7 +79,7 @@ class ChatRequestViewset(viewsets.GenericViewSet):
         response = query.get_response(req)
         
         if not response:
-            return Response({'detail': "Couldn't process request. Try again later"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'detail': "Couldn't process request. Try again later"}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
             date = ChatIdentifierDate.objects.get(date=timezone.now().date())
