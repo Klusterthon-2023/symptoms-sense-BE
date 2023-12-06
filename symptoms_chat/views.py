@@ -40,7 +40,7 @@ class FeedbacksViewset(viewsets.GenericViewSet):
         Thank You!
         """        
         from_email = settings.EMAIL_FROM
-        msg = EmailMessage(subject, text_content, from_email, ["olufunkefamuyiwa@gmail.com"])
+        msg = EmailMessage(subject, text_content, from_email, ["olutemitopefamuyiwa@gmail.com"])
         msg.send()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
