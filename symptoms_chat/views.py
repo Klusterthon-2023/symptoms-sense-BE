@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.core.mail.message import EmailMessage
+from django.conf import settings
 
 from .models import ChatHistory, ChatIdentifier, Feedbacks, ChatIdentifierDate
 from .serializers import (ChatIdentifierSerializer,
@@ -29,6 +31,17 @@ class FeedbacksViewset(viewsets.GenericViewSet):
         serializer.is_valid(raise_exception=True)
         
         serializer.save()
+        
+        subject = f"Feedback message"
+        text_content = f"""
+        Hello Temi,\n\nWe have the following feedback from a user:\n
+        {serializer.validated_data['feedback']}\n\n\n
+        Liaise with the team to follow up and improve the product based on the feedback.\n
+        Thank You!
+        """        
+        from_email = settings.EMAIL_FROM
+        msg = EmailMessage(subject, text_content, from_email, ["olufunkefamuyiwa@gmail.com"])
+        msg.send()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class ChatHistoryIdentifierViewset(viewsets.GenericViewSet):
