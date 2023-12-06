@@ -2,7 +2,7 @@
 
 from django.contrib import admin
 
-from .models import ChatHistory
+from .models import ChatHistory, ChatIdentifier, ChatIdentifierDate
 
 admin.site.empty_value_display = "-empty-"
 
@@ -22,3 +22,5 @@ class ChatAdmin(admin.ModelAdmin):
 
 # Register your models here.
 admin.site.register(ChatHistory, ChatAdmin)
+admin.site.register(ChatIdentifier)
+admin.site.register(ChatIdentifierDate)

@@ -42,7 +42,7 @@ class ChatHistoryIdentifierViewset(viewsets.GenericViewSet):
     
     @action(methods=['GET'], detail=False, serializer_class=ChatIdentifierDateSerializer)
     def ListChatIdentifiers(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(ChatIdentifierDate.objects.filter(chat_identifiers__user=get_object_or_404(UsersAuth, id=self.kwargs['user_pk'])))
+        queryset = self.filter_queryset(ChatIdentifierDate.objects.filter(user=get_object_or_404(UsersAuth, id=self.kwargs['user_pk'])))
         print(queryset)
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -76,21 +76,25 @@ class ChatRequestViewset(viewsets.GenericViewSet):
         query = GPTQuery()
         
         req = serializer.validated_data['request']
-        response = query.get_response(req)
+        try:
+            response = query.get_response(req)
+        except:
+            return Response({'detail': "Couldn't process request. Try again later"}, status=status.HTTP_400_BAD_REQUEST)
         
         if not response:
             return Response({'detail': "Couldn't process request. Try again later"}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            date = ChatIdentifierDate.objects.get(date=timezone.now().date())
+            date = ChatIdentifierDate.objects.get(date=timezone.now().date(), 
+                user = get_object_or_404(UsersAuth, id=self.kwargs['user_pk']),)
         except ChatIdentifierDate.DoesNotExist:
-            date = ChatIdentifierDate.objects.create(date=timezone.now().date())
+            date = ChatIdentifierDate.objects.create(date=timezone.now().date(),
+                user = get_object_or_404(UsersAuth, id=self.kwargs['user_pk']),)
 
         try:
             chat_identifier = ChatIdentifier.objects.get(identifier=serializer.validated_data['identifier'])
         except ChatIdentifier.DoesNotExist:
-            chat_identifier = ChatIdentifier.objects.create(
-                user = get_object_or_404(UsersAuth, id=self.kwargs['user_pk']), date=date,
+            chat_identifier = ChatIdentifier.objects.create( date=date,
                 identifier=serializer.validated_data['identifier'], title=req[:50])
         history = ChatHistory.objects.create(
                 chat_identifier = chat_identifier,

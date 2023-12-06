@@ -32,8 +32,7 @@ class ChatIdentifierSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ChatIdentifier
-        # fields = "__all__"
-        exclude = ("user",)
+        fields = "__all__"
         
 
 class ChatIdentifierDateSerializer(serializers.ModelSerializer):
@@ -58,8 +57,7 @@ class ChatIdentifierHistorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ChatIdentifier
-        # fields = "__all__"
-        exclude = ("user",)
+        fields = "__all__"
 
 
 class ChatResponseHelpfulSerializer(serializers.ModelSerializer):

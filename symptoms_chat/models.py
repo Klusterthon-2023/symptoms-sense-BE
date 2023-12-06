@@ -8,16 +8,21 @@ from django.utils.translation import gettext as _
 class ChatIdentifierDate(models.Model):
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey("accounts.UsersAuth", on_delete=models.CASCADE, related_name="chat_identifier")
     date = models.DateField(auto_now=False, auto_now_add=False, unique=True)
+    
+    def __str__(self) -> str:
+        return f"{self.date}"
     
     class Meta:
         ordering = ('-date',)
+        verbose_name = 'Chat Identifier\'s date'
+        verbose_name_plural = 'Chat Identifiers\' dates'
 
 
 class ChatIdentifier(models.Model):
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey("accounts.UsersAuth", on_delete=models.CASCADE, related_name="chat_identifier")
     identifier = models.CharField(max_length=100, unique=True)
     title = models.CharField(max_length=50)
     date = models.ForeignKey("symptoms_chat.ChatIdentifierDate", on_delete=models.CASCADE, related_name="chat_identifiers")
