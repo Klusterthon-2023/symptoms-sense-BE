@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.core.mail.message import EmailMessage
 from django.conf import settings
+from django.db.utils import IntegrityError
 
 from .models import ChatHistory, ChatIdentifier, Feedbacks, ChatIdentifierDate
 from .serializers import (ChatIdentifierSerializer,
@@ -95,10 +96,10 @@ class ChatRequestViewset(viewsets.GenericViewSet):
             return Response({'detail': "Couldn't process request. Try again later"}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            date = ChatIdentifierDate.objects.get(date=timezone.now().date(), 
+            date = ChatIdentifierDate.objects.create(date=timezone.now().date(), 
                 user = get_object_or_404(UsersAuth, id=self.kwargs['user_pk']),)
-        except ChatIdentifierDate.DoesNotExist:
-            date = ChatIdentifierDate.objects.create(date=timezone.now().date(),
+        except IntegrityError:
+            date = ChatIdentifierDate.objects.get(date=timezone.now().date(),
                 user = get_object_or_404(UsersAuth, id=self.kwargs['user_pk']),)
 
         try:
