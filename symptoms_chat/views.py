@@ -37,9 +37,6 @@ class ChatHistoryIdentifierViewset(viewsets.GenericViewSet):
     serializer_class = ChatIdentifierSerializer
     permission_classes = [IsOwnerUserOrSuperuser]
     
-    def get_queryset(self):
-        return self.queryset.filter(user=get_object_or_404(UsersAuth, id=self.kwargs['user_pk']))
-    
     @action(methods=['GET'], detail=False, serializer_class=ChatIdentifierDateSerializer)
     def ListChatIdentifiers(self, request, *args, **kwargs):
         queryset = self.filter_queryset(ChatIdentifierDate.objects.filter(user=get_object_or_404(UsersAuth, id=self.kwargs['user_pk'])))
@@ -54,7 +51,7 @@ class ChatHistoryIdentifierViewset(viewsets.GenericViewSet):
 
     @action(methods=['GET'], detail=True, serializer_class=ChatIdentifierHistorySerializer)
     def ListChatIdentifierHistory(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+        queryset = self.filter_queryset(self.queryset)
         obj = get_object_or_404(queryset, pk=self.kwargs['pk'])
 
         serializer = self.get_serializer(obj)
