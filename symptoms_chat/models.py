@@ -9,7 +9,7 @@ class ChatIdentifierDate(models.Model):
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey("accounts.UsersAuth", on_delete=models.CASCADE, related_name="chat_identifier")
-    date = models.DateField(auto_now=False, auto_now_add=False, unique=True)
+    date = models.DateField(auto_now=False, auto_now_add=False)
     
     def __str__(self) -> str:
         return f"{self.date}"
@@ -52,7 +52,7 @@ class ChatHistory(models.Model):
     date_time_modified = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return _(f"{self.user.email} history")
+        return _(f"{self.chat_identifier.date.user.email} history")
     
     class Meta:
         ordering = ('-date_time_created',)
