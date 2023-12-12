@@ -133,9 +133,9 @@ class UserViewset(viewsets.ModelViewSet):
                 first_name=serializer.validated_data['first_name'],
                 last_name=serializer.validated_data['last_name'],
             )
+            user.send_welcome_email()
         data = serializer.data
         refresh = RefreshToken.for_user(user)
-        print(refresh)
         data['access_token'] = str(refresh.access_token)
         data['refresh_token'] = str(refresh)
         data['user_id'] = str(user.id)
